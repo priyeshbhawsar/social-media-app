@@ -1,38 +1,21 @@
-import React, { useEffect, useState } from 'react'
-import axios from 'axios'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
 import { Pagination } from 'react-bootstrap';
 import { IComment, IPost } from '../../types';
-import { endpoints } from '../../constant';
+import { useContextProvider } from '../../context/context-provider';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './dashboard.css';
 
+//dashboard page
 const Dashboard: React.FC = () => {
-    const [posts, setPosts] = useState<IPost[]>([]);
-    const [comments, setComments] = useState<IComment[]>([]);
-
-    useEffect(() => {
-        getPost(endpoints);
-    }, []);
-
-    const getPost = async (api: string[]) => {
-        await axios.all(api.map((endpoint) => axios.get(endpoint))).then(
-            axios.spread(({ data: posts }, { data: comments }) => {
-                setPosts(posts);
-                setComments(comments);
-            })
-        ).catch(error => {
-            console.error('Error fetching data:', error);
-        })
-    }
+    const [currentPage, setCurrentPage] = useState(1); //set the current page for pagination
+    const { posts, comments } = useContextProvider(); // get posts and comments from context
 
     const itemsPerPage = 10; // Number of items per page
-    const totalPages = Math.ceil(posts.length / itemsPerPage);
+    const totalPages = Math.ceil(posts.length / itemsPerPage); // Number of pages for pagination
 
-    const [currentPage, setCurrentPage] = useState(1);
-
-    const handleClick = (newPage: number) => {
+    const handleClick = (newPage: number) => { // function to set the page for pagination
         setCurrentPage(newPage);
     };
 
@@ -41,14 +24,14 @@ const Dashboard: React.FC = () => {
     const postData = posts.slice(startIdx, startIdx + itemsPerPage);
 
     const commentsCount = (id: number) => {
-        return comments.filter((item: { postId: number; }) => item.postId === id).length;
+        return comments.filter((item: IComment) => item.postId === id).length; //calcuate comments count
     }
 
     const handleSignOut = () => {
         const storedUserData = localStorage.getItem('userDetails');
 
         if (storedUserData) {
-            localStorage.removeItem('userDetails');
+            localStorage.removeItem('userDetails'); //signout the user from dashboard page
         }
     }
 
