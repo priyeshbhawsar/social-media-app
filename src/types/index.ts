@@ -12,10 +12,6 @@ export interface IContextType {
     addComments: (comments: IComment[]) => void;
 }
 
-// export interface IPostProviderProps {
-//     children: ReactNode;
-// }
-
 export interface IProviderProps {
     children: ReactNode;
 }
